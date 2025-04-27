@@ -34,11 +34,10 @@ int main(){
 	cout<<"\nChuoi h2: "<<h2;
 	for(int i=0;i<C.size()/2;i++){
 		P=P+h1[i]+h2[i];
-
 	}
 	if(n==1){
 		P+=h1[h1.size()-1];
 	}
-	cout<<"Chuoi giai ma: "<<P;
+	cout<<"\nChuoi giai ma: "<<P;
 }
 

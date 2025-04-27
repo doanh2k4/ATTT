@@ -75,7 +75,7 @@ string giaiMaHill(string thongDiepMaHoa, vector<vector<int>> khoa) {
     int detInv = nghichDaoMod(det % 26, 26);
 
     if (detInv == -1) {
-        throw invalid_argument("Key matrix is not invertible.");
+        throw invalid_argument("Khong ton tai nghich dao");
     }
 
     vector<vector<int>> adj(n, vector<int>(n));

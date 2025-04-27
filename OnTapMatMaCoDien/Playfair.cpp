@@ -5,133 +5,128 @@
 
 using namespace std;
 
-void chuanBiMaTranKhoa(string khoa, char maTranKhoa[5][5]) {
-    vector<bool> daSuDung(26, false);
-    daSuDung['J' - 'A'] = true;
+void prepareKeyMatrix(string key, char keyMatrix[5][5]) {
+    vector<bool> used(26, false);
+    used['J' - 'A'] = true;
 
-    int hang = 0, cot = 0;
-    for (char c : khoa) {
+    int row = 0, col = 0;
+    for (char c : key) {
         if (c == 'J') c = 'I';
-        if (!daSuDung[c - 'A']) {
-            maTranKhoa[hang][cot++] = c;
-            daSuDung[c - 'A'] = true;
-            if (cot == 5) {
-                cot = 0;
-                hang++;
+        if (!used[c - 'A']) {
+            keyMatrix[row][col++] = c;
+            used[c - 'A'] = true;
+            if (col == 5) {
+                col = 0;
+                row++;
             }
         }
     }
 
     for (char c = 'A'; c <= 'Z'; c++) {
-        if (!daSuDung[c - 'A']) {
-            maTranKhoa[hang][cot++] = c;
-            if (cot == 5) {
-                cot = 0;
-                hang++;
+        if (!used[c - 'A']) {
+            keyMatrix[row][col++] = c;
+            used[c - 'A'] = true;
+            if (col == 5) {
+                col = 0;
+                row++;
             }
         }
     }
 }
 
-string xuLyVanBanGoc(string vanBanGoc) {
+string preprocessPlaintext(string plaintext) {
     string processed = "";
-    for (char c : vanBanGoc) {
-        if (c == 'J') c = 'I';
-        if (isalpha(c)) processed += toupper(c);
+    for (char c : plaintext) {
+        if (isalpha(c)) {
+            processed += toupper(c);
+        }
     }
-
     for (size_t i = 0; i < processed.length() - 1; i += 2) {
         if (processed[i] == processed[i + 1]) {
             processed.insert(i + 1, "X");
         }
     }
-
     if (processed.length() % 2 != 0) {
         processed += 'X';
     }
-
     return processed;
 }
 
-void timViTri(char kyTu, char maTranKhoa[5][5], int &hang, int &cot) {
+void findPosition(char c, char keyMatrix[5][5], int &row, int &col) {
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
-            if (maTranKhoa[i][j] == kyTu) {
-                hang = i;
-                cot = j;
+            if (keyMatrix[i][j] == c) {
+                row = i;
+                col = j;
                 return;
             }
         }
     }
 }
 
-string maHoaCapKyTu(char a, char b, char maTranKhoa[5][5]) {
+string encryptPair(char a, char b, char keyMatrix[5][5]) {
     int row1, col1, row2, col2;
-    timViTri(a, maTranKhoa, row1, col1);
-    timViTri(b, maTranKhoa, row2, col2);
+    findPosition(a, keyMatrix, row1, col1);
+    findPosition(b, keyMatrix, row2, col2);
 
     if (row1 == row2) {
-        return string(1, maTranKhoa[row1][(col1 + 1) % 5]) + maTranKhoa[row2][(col2 + 1) % 5];
+        return string(1, keyMatrix[row1][(col1 + 1) % 5]) + keyMatrix[row2][(col2 + 1) % 5];
     } else if (col1 == col2) {
-        return string(1, maTranKhoa[(row1 + 1) % 5][col1]) + maTranKhoa[(row2 + 1) % 5][col2];
+        return string(1, keyMatrix[(row1 + 1) % 5][col1]) + keyMatrix[(row2 + 1) % 5][col2];
     } else {
-        return string(1, maTranKhoa[row1][col2]) + maTranKhoa[row2][col1];
+        return string(1, keyMatrix[row1][col2]) + keyMatrix[row2][col1];
     }
 }
 
-string giaiMaCapKyTu(char a, char b, char maTranKhoa[5][5]) {
+string encrypt(string plaintext, string key) {
+    char keyMatrix[5][5];
+    prepareKeyMatrix(key, keyMatrix);
+    plaintext = preprocessPlaintext(plaintext);
+
+    string ciphertext = "";
+    for (size_t i = 0; i < plaintext.length(); i += 2) {
+        ciphertext += encryptPair(plaintext[i], plaintext[i + 1], keyMatrix);
+    }
+    return ciphertext;
+}
+
+string decryptPair(char a, char b, char keyMatrix[5][5]) {
     int row1, col1, row2, col2;
-    timViTri(a, maTranKhoa, row1, col1);
-    timViTri(b, maTranKhoa, row2, col2);
+    findPosition(a, keyMatrix, row1, col1);
+    findPosition(b, keyMatrix, row2, col2);
 
     if (row1 == row2) {
-        return string(1, maTranKhoa[row1][(col1 + 4) % 5]) + maTranKhoa[row2][(col2 + 4) % 5];
+        return string(1, keyMatrix[row1][(col1 + 4) % 5]) + keyMatrix[row2][(col2 + 4) % 5];
     } else if (col1 == col2) {
-        return string(1, maTranKhoa[(row1 + 4) % 5][col1]) + maTranKhoa[(row2 + 4) % 5][col2];
+        return string(1, keyMatrix[(row1 + 4) % 5][col1]) + keyMatrix[(row2 + 4) % 5][col2];
     } else {
-        return string(1, maTranKhoa[row1][col2]) + maTranKhoa[row2][col1];
+        return string(1, keyMatrix[row1][col2]) + keyMatrix[row2][col1];
     }
 }
 
-string maHoa(string vanBanGoc, string khoa) {
-    char maTranKhoa[5][5];
-    chuanBiMaTranKhoa(khoa, maTranKhoa);
-    vanBanGoc = xuLyVanBanGoc(vanBanGoc);
+string decrypt(string ciphertext, string key) {
+    char keyMatrix[5][5];
+    prepareKeyMatrix(key, keyMatrix);
 
-    string vanBanMaHoa = "";
-    for (size_t i = 0; i < vanBanGoc.length(); i += 2) {
-        vanBanMaHoa += maHoaCapKyTu(vanBanGoc[i], vanBanGoc[i + 1], maTranKhoa);
+    string plaintext = "";
+    for (size_t i = 0; i < ciphertext.length(); i += 2) {
+        plaintext += decryptPair(ciphertext[i], ciphertext[i + 1], keyMatrix);
     }
-
-    return vanBanMaHoa;
-}
-
-string giaiMa(string vanBanMaHoa, string khoa) {
-    char maTranKhoa[5][5];
-    chuanBiMaTranKhoa(khoa, maTranKhoa);
-
-    string vanBanGoc = "";
-    for (size_t i = 0; i < vanBanMaHoa.length(); i += 2) {
-        vanBanGoc += giaiMaCapKyTu(vanBanMaHoa[i], vanBanMaHoa[i + 1], maTranKhoa);
-    }
-
-    return vanBanGoc;
+    return plaintext;
 }
 
 int main() {
-    string khoa, vanBanGoc, vanBanMaHoa;
-
+    string key, plaintext;
     cout << "Nhap khoa: ";
-    cin >> khoa;
+    cin >> key;
+    cout << "Nhap chuoi plaintext: ";
+    cin >> plaintext;
 
-    cout << "Nhap van ban goc: ";
-    cin >> vanBanGoc;
+    string ciphertext = encrypt(plaintext, key);
+    cout << "Chuoi da ma hoa: " << ciphertext << endl;
 
-    vanBanMaHoa = maHoa(vanBanGoc, khoa);
-    cout << "Van ban ma hoa: " << vanBanMaHoa << endl;
-
-    string vanBanGiaiMa = giaiMa(vanBanMaHoa, khoa);
-    cout << "Van ban giai ma: " << vanBanGiaiMa << endl;
+    string decryptedText = decrypt(ciphertext, key);
+    cout << "Chuoi duoc giai ma: " << decryptedText << endl;
 
     return 0;
 }
