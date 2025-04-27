@@ -1,0 +1,10 @@
+Tìm xem P1 xuất hiện ở vị trí nào trong ma trận (h1,c1)
+Tìm xem P2 xuất hiện ở ví trị này trong ma trận (h2,c2)
+
+Nếu h1 khác h2 và c1 khác c2 => p1 thay bằng (h1,c2)
+
+				p2 thay bằng (h2,c1)
+
+Nếu h1=h2
+
+Nếu c1=c2
