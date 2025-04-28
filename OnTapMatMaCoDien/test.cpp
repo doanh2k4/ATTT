@@ -50,18 +50,13 @@ string decrypt(const string &ciphertext) {
 
 int main() {
     string plaintext;
-    cout << "Nhập chuỗi plaintext (dài không quá 25 ký tự): ";
+    cout << "Nhap chuoi: ";
     getline(cin, plaintext);
-
-    if (plaintext.size() > 25) {
-        cout << "Chuỗi nhập vào quá dài! Vui lòng nhập lại.\n";
-        return 1;
-    }
 
     char matrix[5][5];
     fillMatrix(plaintext, matrix);
 
-    cout << "Ma trận 5x5 từ chuỗi plaintext:\n";
+    cout << "Ma tran 5x5 tu chuoi plaintext:\n";
     for (int i = 0; i < 5; ++i) {
         for (int j = 0; j < 5; ++j) {
             cout << setw(2) << matrix[i][j] << ' ';
@@ -70,10 +65,10 @@ int main() {
     }
 
     string ciphertext = encrypt(matrix);
-    cout << "Ciphertext: " << ciphertext << '\n';
+    cout << "Chuoi ma hoa: " << ciphertext << '\n';
 
     string decryptedText = decrypt(ciphertext);
-    cout << "Giải mã ciphertext: " << decryptedText << '\n';
+    cout << "Chuoi da giai ma: " << decryptedText << '\n';
 
     return 0;
 }
